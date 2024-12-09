@@ -1,0 +1,154 @@
+body {
+    font-size: 16px; /* Smaller font size */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+
+#landing-page, #experiment-page {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 20px; /* Added padding for better spacing */
+    box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+h1 {
+    font-size: 30px; /* Adjust font size as needed */
+    color: #333; /* Ensure the color contrasts with the background */
+    /*margin-bottom: 20px; Add space below the title*/
+    margin-top: 500px;
+}
+
+h2 {
+    font-size: 18px; /* Adjust font size as needed */
+    color: #333; /* Ensure the color contrasts with the background */
+    /*margin-bottom: 20px; Add space below the title*/
+    margin-top: 5px;
+}
+
+
+#landing-page p {
+    margin: 20px 0;
+}
+
+#color-options {
+    margin-top: 20px;
+}
+
+.color-box {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+#color-options label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 0; /* Increased margin for more space */
+    width: 200px;
+}
+
+button {
+    padding: 10px 20px; /* Reduced padding for a smaller button */
+    font-size: 16px; /* Reduced font size for a smaller button */
+    margin-top: 20px; /* Added margin to separate from the color options */
+}
+
+.word-list {
+    font-size: 40px; /* Increased font size */
+    font-weight: bold; /* Made font thicker */
+    margin: 30px;
+}
+
+#recall-input {
+    width: 80%;
+    height: 100px;
+    margin: 20px 0;
+}
+
+.dark-mode {
+    background-color: #333;
+    color: white;
+}
+
+.light-mode {
+    background-color: white;
+    color: black;
+}
+
+.dark-mode h2, .dark-mode p, .dark-mode label {
+    color: white; /* Ensure titles, paragraphs, and labels are white in dark mode */
+}
+
+#survey-form {
+    display: flex;
+    flex-direction: column; /* Arrange questions vertically */
+    width: 100%;
+}
+
+.form-table {
+    margin: 0 auto; /* Center the table */
+    border-collapse: collapse; /* Remove table borders */
+}
+
+.form-group {
+    margin-bottom: 50px; /* Increased space between questions */
+    padding-top: 20px; /* Add padding to the top of each question */
+    padding-bottom: 20px; /* Add padding to the bottom of each question */
+}
+
+label {
+    font-weight: bold;
+    color: #4a90e2;
+}
+
+input[type="radio"],
+input[type="text"],
+input[type="time"] {
+    margin-bottom: 10px;
+}
+
+input[type="text"],
+input[type="time"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.small-input {
+    width: 50%; /* Smaller width for the time input */
+}
+
+.submit-button {
+    width: auto; /* Adjust width for the submit button */
+    padding: 10px 20px; /* Reduced padding */
+    font-size: 16px; /* Reduced font size */
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    /*display: inline-block;*/
+}
+
+.submit-button:hover {
+    background-color: #357ab8;
+}
+
+
+

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" 
+            content="width=device-width, initial-scale=1.0">
+        <title>Demographic Survey screen</title>
+    </head>
+    <body>
+        <h1>Welcome to Recall Test!</h1>
+        <h3>This survey aims to gather anonymous demographic information to better understand</h3>
+        <h3>the composition of our study participants.</h3>
+        <h3>Your responses will help us analyze the impact of digital environments on memory retention.</h3>
+        <h3>Participation is voluntary, and all information will be kept confidential, </h3>
+        <h3>but you will need to respond to ALL (**) the questions below in order to move forward with the test.</h3>
+        <h3>Thank you for your contribution!</h3>
+
+        <form id="demographicSurvey" onsubmit="saveSurveyData(event)">
+            <!-- question 1 Age -->
+            <div>
+                <p>**Age:</p>
+                <input type="radio" id="q1a1" name="age" value="under 18">
+                <label for="q1a1">under 18</label><br>
+                <input type="radio" id="q1a2" name="age" value="18-24">
+                <label for="q1a2">18-24</label><br>
+                <input type="radio" id="q1a3" name="age" value="25-34">
+                <label for="q1a3">25-34</label><br>
+                <input type="radio" id="q1a4" name="age" value="35 or older">
+                <label for="q1a4">35 or older</label>
+            </div>
+
+            <!-- question 2 classification  -->
+
+            <div>
+                <p>**Classification</p>
+                <input type="radio" id="q2a1" name="classif" value="Freshman">
+                <label for="q2a1">Freshman</label><br>
+                <input type="radio" id="q2a2" name="classif" value="Sophomore">
+                <label for="q2a2">Sophomore</label><br>
+                <input type="radio" id="q2a3" name="classif" value="Junior">
+                <label for="q2a3">Junior</label><br>
+                <input type="radio" id="q2a4" name="classif" value="Senior">
+                <label for="q2a4">Senior</label><br>
+                <input type="radio" id="q2a5" name="classif" value="5th year">
+                <label for="q2a5">5th year</label><br>
+                <input type="radio" id="q2a6" name="classif" value="Graduate Student">
+                <label for="q2a6">Graduate Student</label><br>
+            </div>
+
+            <!-- question 3 eye problems -->
+
+            <div>
+                <p>**Do you have any eye disorders? (e.g., myopia, hyperopia, astigmatism, color blindness, etc.)</p>
+                <input type="radio" id="q3a1" name="eyeProb" value="Yes">
+                <label for="q3a1">Yes</label><br>
+                <input type="radio" id="q3a2" name="eyeProb" value="No">
+                <label for="q3a2">No</label><br>
+            </div>
+
+            <!-- question 4 study time -->
+
+            <div>
+                <p>**What part of the day do you usually study?</p>
+                <input type="radio" id="q4a1" name="studyTime" value="Morning">
+                <label for="q4a1">Morning</label><br>
+                <input type="radio" id="q4a2" name="studyTime" value="Afternoon">
+                <label for="q4a2">Afternoon</label><br>
+                <input type="radio" id="q4a3" name="studyTime" value="Evening">
+                <label for="q4a3">Evening</label><br>
+                <input type="radio" id="q4a4" name="studyTime" value="Night">
+                <label for="q4a4">Night</label><br>
+            </div>
+
+            <!-- question 5 Dark Mode -->
+
+            <div>
+                <p>**Do you use any devices in Dark Mode?</p>
+                <input type="radio" id="q5a1" name="darkMode" value="Yes">
+                <label for="q5a1">Yes</label><br>
+                <input type="radio" id="q5a2" name="darkMode" value="No">
+                <label for="q5a2">No</label><br>
+            </div>
+
+            <!-- Hidden input field for storing current time -->
+            <input type="hidden" id="submission-time" name="submission-time">
+            <p></p>
+            <p></p>
+            <!-- Submit Survey Button -->
+            <button type="submitSurvey">Submit</button>
+
+        </form>
+            <!-- Firebase and JavaScript -->
+             
+            <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
+            <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js"></script>
+            <script type="module">
+                // Import the functions you need from the SDKs you need
+                import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+                //import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+                import { getDatabase, ref, set, push, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+                // TODO: Add SDKs for Firebase products that you want to use
+                // https://firebase.google.com/docs/web/setup#available-libraries
+              
+                // Your web app's Firebase configuration
+                // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+                const firebaseConfig = {
+                    apiKey: "...",
+                    authDomain: "...",
+                    databaseURL: "...",
+                    projectId: "...",
+                    storageBucket: "...",
+                    messagingSenderId: "...",
+                    appId: "...",
+                    measurementId: "...",
+                };
+              
+                // Initialize Firebase
+                const app = initializeApp(firebaseConfig);
+                const db = getDatabase(app);
+                //const analytics = getAnalytics(app);
+
+                // Wait for the DOM to be fully loaded
+                document.addEventListener("DOMContentLoaded", function () {
+                    // Get form element
+                    const form = document.getElementById('demographicSurvey');
+                    
+                    if (form) {
+                        // Save data to Firebase when form is submitted
+                        form.addEventListener('submit', saveSurveyData);
+                    } else {
+                        console.error("Form not found!");
+                    }
+                });
+
+                // Function to add the current time before form submission
+                function addCurrentTime() {
+                    const currentTime = new Date().toISOString();
+                    document.getElementById('submission-time').value = currentTime;
+                }
+
+        
+                // Function to save survey data to Firebase
+            function saveSurveyData(event) {
+                event.preventDefault();  // Prevent form from submitting the traditional way
+
+                // Gather form data
+                const formData = new FormData(event.target);
+                const surveyData = {};
+                formData.forEach((value, key) => {
+                    surveyData[key] = value;
+                });
+
+                // Add the current time to the survey data
+                surveyData['submission-time'] = new Date().toISOString();
+
+                // Get a reference to the "Participants" collection in Firebase
+                const db = getDatabase();
+                const participantsRef = ref(db, 'Participants');
+
+                // Push a new participant entry to Firebase (this automatically generates a unique ID)
+                const newParticipantRef = push(participantsRef);
+
+                // Save the survey data with the generated participant ID
+                set(newParticipantRef, surveyData)
+                    .then(() => {
+                        // Generate the participant ID from the Firebase push
+                        const participantID = newParticipantRef.key;
+
+                        // Log to verify if the ID is generated
+                        console.log("Generated Participant ID:", participantID);
+
+                        // Save the participant ID in sessionStorage for use on the next page
+                        sessionStorage.setItem('participantID', participantID);
+
+                        // Log to verify if the ID is saved in sessionStorage
+                        console.log("Participant ID saved to sessionStorage:", sessionStorage.getItem('participantID'));
+
+                        // Data saved successfully
+                        console.log("Data saved successfully");
+                        window.location.href = "favColor.html";  // Redirect to next page
+                    })
+                    .catch((error) => {
+                        console.error("Error saving data: ", error);
+                    });
+            }
+
+
+                            
+
+
+            </script>
+        
+    </body>
+</html>

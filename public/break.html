@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Break Page</title>
+
+    <style>
+        /* Style the full-screen break container */
+        body, html {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        /* Style the GIF image */
+        img {
+            width: 300px;
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        /* Style for text */
+        h1, p {
+            margin: 10px;
+        }
+    </style>
+
+</head>
+<body>
+    <h1>Take a short break!💆‍♂️</h1>
+    <p>After this screen disappears you will start the test.</p>
+    <p>You will have 7 seconds to memorize the list of words.</p>
+
+    <img src="loadingGifForBreakExperimentWeb.gif" alt="Loading ..." />
+
+    <script>
+        // Retrieve timeout duration from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const duration = urlParams.get('duration') || 7000;  // Default to 7 seconds if not specified
+        const nextPage = urlParams.get('next') || 'experiment.html';  // Default next page if not specified
+
+        // Set a timeout for the specified duration
+        setTimeout(function() {
+            window.location.href = nextPage;
+        }, duration);
+
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "memoryexperimentweb",
+  "type": "module",
+  "version": "1.0.0",
+  "main": "codeFun.js",
+  "scripts": {
+    "start": "node codeFun.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.1",
+    "firebase": "^10.14.1"
+  }
+}

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #words, #recall, #break-screen {
+            display: none;
+        }
+        #recall input {
+            width: 80%;
+            padding: 10px;
+            font-size: 1.2em;
+        }
+
+        /* Style the GIF image */
+        img {
+            width: 300px;
+            height: 300px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="experiment">
+        <h2 id="words"></h2>
+        <div id="recall">
+            <p>Please type as many words as you can remember.</p>
+            <p>Write each word on a new line.</p>
+            <p>When you feel like you are done, click submit.</p>
+            <textarea id="recall-input" rows="4" cols="50" placeholder="Enter the words you recall here..."></textarea>
+            <br><br>
+            <button id="submitRecallButton">Submit</button>
+        </div>
+        <div id="break-screen">
+            <h1>Take a short break! 💆‍♂️</h1>
+            <p>After this screen disappears, you will start the next test.</p>
+            <img src="loadingGifForBreakExperimentWeb.gif" alt="Loading ..." />
+
+        </div>
+    </div>
+
+            <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
+            <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js"></script>
+            <script type="module">
+                // Import the functions you need from the SDKs you need
+                import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+                //import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
+                import { getDatabase, ref, set, push, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+                // TODO: Add SDKs for Firebase products that you want to use
+                // https://firebase.google.com/docs/web/setup#available-libraries
+              
+                // Your web app's Firebase configuration
+                // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+                const firebaseConfig = {
+                  apiKey: "...",
+                  authDomain: "...",
+                  databaseURL: "...",
+                  projectId: "...",
+                  storageBucket: "...",
+                  messagingSenderId: "...",
+                  appId: "...",
+                  measurementId: "...",
+                };
+              
+                // Initialize Firebase
+                const app = initializeApp(firebaseConfig);
+                const db = getDatabase(app);
+                //const analytics = getAnalytics(app);
+
+
+        const wordLists = [
+            // Provide your 20 lists of 7 words here, e.g., [["word1", "word2", ...], ...]
+            ['accord', 'animal', 'bricks', 'castle', 'desert', 'export', 'fabric'], //1
+            ['grains', 'hacked', 'invest', 'jungle', 'kidnap', 'lender', 'market'], //2
+            ['nectar', 'oceans', 'public', 'relate', 'sculpt', 'towels', 'uplift'], //3
+            ['vendor', 'wealth', 'zenith', 'almost', 'beauty', 'bright', 'yonder'], //4
+            ['depend', 'device', 'elapse', 'factor', 'gender', 'happen', 'income'], //5
+            ['jigsaw', 'walled', 'laughs', 'motion', 'notice', 'object', 'people'], //6
+            ['quests', 'record', 'summit', 'tundra', 'unique', 'vortex', 'canvas'], //7
+            ['client', 'absorb', 'bucket', 'circus', 'demand', 'editor', 'finely'], //8
+            ['graced', 'honing', 'impact', 'jargon', 'kernel', 'locate', 'modest'], //9
+            ['newest', 'outrun', 'parade', 'quiver', 'reform', 'shiver', 'timber'], //10
+            ['crisis', 'volume', 'wisdom', 'accent', 'barter', 'cactus', 'divide'], //11
+            ['effort', 'fusion', 'ground', 'hugged', 'import', 'jellys', 'kitten'], //12
+            ['locked', 'manage', 'nation', 'omend', 'picnic', 'rarity', 'sailing'], //13
+            ['target', 'useful', 'vision', 'warmed', 'yellow', 'answer', 'battle'], //14
+            ['cradle', 'doctor', 'engage', 'finish', 'gather', 'heights', 'inspire'], //15
+            ['jewel', 'leader', 'mother', 'newly', 'effect', 'plaza', 'radial'], //16
+            ['smooth', 'clinic', 'uphold', 'verity', 'wonder', 'dragon', 'bitter'], //17
+            ['gentle', 'longer', 'velvet', 'strain', 'yonder', 'symbol', 'walled'], //18
+            ['spiral', 'refine', 'insight', 'driven', 'hazing', 'titled', 'honest'], //19
+            ['career','author','elderly', 'double', 'bubble', 'elites','failed' ] //20
+                   
+        ];
+
+        const selectedLists = [];
+        const participantID = sessionStorage.getItem('participantID');
+        const favoriteColor = sessionStorage.getItem('favoriteColor') || 'blue';
+
+        let currentStage = 0;
+        let recallData = [];
+
+        function selectRandomLists() {
+            while (selectedLists.length < 4) {
+                const randomList = wordLists[Math.floor(Math.random() * wordLists.length)];
+                if (!selectedLists.includes(randomList)) {
+                    selectedLists.push(randomList);
+                }
+            }
+        }
+
+        function startStage() {
+            if (currentStage >= 4) {
+                endExperiment();
+                return;
+            }
+
+            const list = selectedLists[currentStage];
+            const displayElement = document.getElementById('words');
+            const recallInput = document.getElementById('recall-input');
+
+            // Apply the appropriate style based on the current list number
+            setListStyle(currentStage + 1);
+
+            displayElement.innerText = list.join(', ');
+            displayElement.style.display = 'block';
+
+            // Show list for 7 seconds, then transition to recall box
+            setTimeout(() => {
+                displayElement.style.display = 'none';
+                document.getElementById('recall').style.display = 'block';
+                recallInput.value = ''; // Clear input for each stage
+            }, 7000);
+        }
+
+      // Helper function to apply text color with custom color mappings
+        function applyTextColor(listNumber, textElement, bgElement) {
+            // Define a map for non-standard color names with their hex values
+            let colorMap = {
+                "Seafoam Green": "#9FE2BF",
+                "Light Blue": "#ADD8E6",
+                "Sky Blue": "#87CEEB",
+                "Dark Blue": "#00008B"  // Hex code for Dark Blue
+                // Add more custom mappings if needed
+            };
+
+            // Retrieve the favorite color from sessionStorage
+            const selectedColor = sessionStorage.getItem('favoriteColor');
+
+            // Check if the color is in the map; if not, use the color as is
+            const textColor = colorMap[selectedColor] || selectedColor.toLowerCase();
+
+            // Apply the text color based on list number
+            if (listNumber === 2 || listNumber === 3) {
+                textElement.style.color = textColor;
+            } else if (listNumber === 1) {
+                textElement.style.color = 'black';
+            } else if (listNumber === 4) {
+                textElement.style.color = 'white';
+            }
+        }
+
+
+        // Main function to set the list style
+        function setListStyle(listNumber) {
+            const textElement = document.getElementById('words'); // Element to display word list
+            const bgElement = document.body; // Background container, applying style to body
+
+            // Set background color based on list number
+            if (listNumber === 1 || listNumber === 2) {
+                bgElement.style.backgroundColor = 'white';
+            } else if (listNumber === 3 || listNumber === 4) {
+                bgElement.style.backgroundColor = '#3a3a3a';
+            }
+
+            // Apply text color using the helper function
+            applyTextColor(listNumber, textElement, bgElement);
+        }
+
+        function submitRecall() {
+            const userRecall = document.getElementById('recall-input').value.trim()
+                .split(/\s+|,|\n+/)
+                .map(word => word.trim().toLowerCase())
+                .filter(word => word.length >= 0);
+
+            recallData.push({
+                shownList: selectedLists[currentStage],
+                response: userRecall,
+                percentage: calculatePercentage(selectedLists[currentStage], userRecall)
+            });
+
+            document.getElementById('recall').style.display = 'none';
+            currentStage++;
+
+            if (currentStage < 4) {
+                showBreak();
+            } else {
+                endExperiment();
+            }
+        }
+
+        document.getElementById('submitRecallButton').addEventListener('click', submitRecall);
+
+        function showBreak() {
+            const breakScreen = document.getElementById('break-screen');
+            breakScreen.style.display = 'block';
+
+            setTimeout(() => {
+                breakScreen.style.display = 'none';
+                startStage();
+            }, 5000); // Break for 5 seconds
+        }
+
+        function calculatePercentage(shownList, userRecall) {
+            const correctWords = shownList.filter(word => userRecall.includes(word));
+            const percentage = (correctWords.length / shownList.length) * 100;
+            return percentage.toFixed(2); // Round to 2 decimal places
+        }
+
+        function endExperiment() {
+            const participantRef = ref(db, `Participants/${participantID}/experimentResults`);
+
+            set(participantRef, recallData)
+                .then(() => {
+                    document.getElementById('experiment').innerHTML = '';
+                    const thankYouMessage = document.createElement('div');
+                    thankYouMessage.innerHTML = `
+                        <h2>Thank you for participating!</h2>
+                        <p>You can exit the test by closing the tab. We appreciate your contribution!</p>
+                    `;
+                    thankYouMessage.style.textAlign = 'center';
+                    document.getElementById('experiment').appendChild(thankYouMessage);
+                })
+                .catch(error => {
+                    console.error("Error saving experiment results:", error);
+                });
+        }
+
+        // Initialize experiment
+        selectRandomLists();
+        startStage();
+
+    </script>
+</body>
+</html>
